@@ -1,29 +1,60 @@
-import express from "express";
-import cors from "cors";
-import cookieParser from "cookie-parser";
-import { connect } from "./config/db";
+import express from 'express';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import routes from './routes/v1';
+import { errorHandler } from './middleware/error-handler.middleware';
 
-import { log } from "./utils/logger.utils";
+import dotenv from 'dotenv';
+import { apiRateLimiter } from './middleware/rate-limit.middleware';
+
+import { whiteListUrls } from './constant/cors.constant';
+import compression from 'compression';
+import helmet from 'helmet';
+import { logger } from './utils/logger.utils';
+
+dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
 
+app.use(helmet());
 app.use(
   cors({
-    origin: ["http://localhost:3000", "http://localhost:5000"],
+    origin: whiteListUrls,
     credentials: true,
   })
 );
-app.use(cookieParser());
-app.use(express.json());
 
-connect()
-  .then(() => {
-    app.listen(PORT, () => {
-      log("info", `Server running on port ${PORT}`);
-    });
-  })
-  .catch((err) => {
-    log("error", "Failed to connect to DB", err);
-    process.exit(1);
+app.use(cookieParser());
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+app.use(compression());
+
+app.use((req, _, next) => {
+  logger.info(`${req.method} ${req.path}`, {
+    ip: req.ip,
+    userAgent: req.get('User-Agent'),
+    query: req.query,
   });
+  next();
+});
+
+app.use('/api', apiRateLimiter);
+app.use('/api/v1', routes);
+
+app.get('/health', (_, res) => {
+  res.json({
+    success: true,
+    message: 'WooCommerce Sync API is running',
+    timestamp: new Date().toISOString(),
+    environment: process.env.NODE_ENV,
+  });
+});
+
+app.use((_, res) => {
+  res.status(404).json({ success: false, message: 'Route not found' });
+});
+
+app.use(errorHandler);
+
+export default app;
