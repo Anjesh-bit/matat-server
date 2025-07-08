@@ -8,10 +8,12 @@ export const getProductsHandler = async (
 ): Promise<void> => {
   try {
     const query = req.query;
+
     const result = await productServices.getProducts(query);
 
     const productsWithOrderCount = await Promise.all(
       result.products.map(async (product) => {
+        await productServices.syncProductIfNeeded(product.id);
         const orderCount = await productServices.getProductOrderCount(product.id);
         return { ...product, orderCount };
       })

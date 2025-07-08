@@ -118,17 +118,17 @@ src/
 
 ## Environment Variables
 
-| Variable                      | Description               | Default                                    |
-| ----------------------------- | ------------------------- | ------------------------------------------ |
-| `NODE_ENV`                    | Environment               | development                                |
-| `PORT`                        | Server port               | 5000                                       |
-| `DB_NAME`                     | Database name             | nodejstuts                                 |
-| `WOOCOMMERCE_API_BASE_URL`    | WooCommerce store URL     | https://interview-test.matat.io            |
-| `WOOCOMMERCE_CONSUMER_KEY`    | WooCommerce API key       | Required                                   |
-| `WOOCOMMERCE_CONSUMER_SECRET` | WooCommerce API secret    | Required                                   |
-| `SYNC_CRON_SCHEDULE`          | Cron schedule for sync    | 0 12 \* \* \*                              |
-| `ORDER_RETENTION_DAYS`        | Order retention period    | 90                                         |
-| `ORDER_FETCH_DAYS`            | Order fetch period        | 30                                         |
+| Variable                      | Description            | Default                         |
+| ----------------------------- | ---------------------- | ------------------------------- |
+| `NODE_ENV`                    | Environment            | development                     |
+| `PORT`                        | Server port            | 5000                            |
+| `DB_NAME`                     | Database name          | nodejstuts                      |
+| `WOOCOMMERCE_API_BASE_URL`    | WooCommerce store URL  | https://interview-test.matat.io |
+| `WOOCOMMERCE_CONSUMER_KEY`    | WooCommerce API key    | Required                        |
+| `WOOCOMMERCE_CONSUMER_SECRET` | WooCommerce API secret | Required                        |
+| `SYNC_CRON_SCHEDULE`          | Cron schedule for sync | 0 12 \* \* \*                   |
+| `ORDER_RETENTION_DAYS`        | Order retention period | 90                              |
+| `ORDER_FETCH_DAYS`            | Order fetch period     | 30                              |
 
 ## API Endpoints
 
@@ -283,3 +283,5 @@ The application is ready for deployment on platforms like:
 ## License
 
 MIT License - see LICENSE file for details.
+
+👉 **Full Project Description:** Check out the [docs/project-description.md](docs/project-description.md) file for detailed information.
