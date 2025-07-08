@@ -1,7 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
 import syncServices from '../services/sync.services';
+import productServices from '../services/product.services';
 
-export const triggerSyncHandler = async (
+export const syncOrdersHandler = async (
   _: Request,
   res: Response,
   next: NextFunction
@@ -31,4 +32,18 @@ export const getStatusHandler = (req: Request, res: Response): void => {
     success: true,
     data: status,
   });
+};
+
+export const syncProductsHandler = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const syncedProducts = await productServices.syncAllMissingProducts();
+
+    res.json({
+      success: true,
+      message: `Synced ${syncedProducts.length} missing products from WooCommerce`,
+      data: syncedProducts,
+    });
+  } catch (error) {
+    next(error);
+  }
 };

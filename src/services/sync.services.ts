@@ -2,6 +2,7 @@ import cron from 'node-cron';
 import { SyncResult, SyncStats } from '../types/sync.types';
 import { log } from '../utils/logger.utils';
 import orderServices from './order.services';
+import { EnvUtils } from '../config/env';
 
 class SyncService {
   private isRunning: boolean;
@@ -20,7 +21,8 @@ class SyncService {
   }
 
   public startScheduledSync(): void {
-    const cronSchedule = process.env.SYNC_CRON_SCHEDULE || '0 12 * * *';
+    const serverConfig = EnvUtils.getServerConfig();
+    const cronSchedule = serverConfig.syncCronSchedule || '0 12 * * *';
 
     cron.schedule(cronSchedule, async () => {
       if (this.isRunning) {

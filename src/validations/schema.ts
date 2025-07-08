@@ -17,7 +17,7 @@ export const orderSchema = Joi.object({
   billing: Joi.object().required(),
   shipping: Joi.object().required(),
   line_items: Joi.array().items(Joi.object()).required(),
-});
+}).unknown(true);
 
 export const productSchema = Joi.object({
   id: Joi.number().required(),
@@ -31,7 +31,7 @@ export const productSchema = Joi.object({
   images: Joi.array().items(Joi.object()).default([]),
   stock_quantity: Joi.number().allow(null),
   in_stock: Joi.boolean().default(true),
-});
+}).unknown(true);
 
 export const querySchema = Joi.object({
   page: Joi.number().integer().min(1).default(1),
@@ -40,6 +40,7 @@ export const querySchema = Joi.object({
   status: Joi.string().allow(''),
   sort: Joi.string().valid('date_created', 'total', 'name', 'price').default('date_created'),
   order: Joi.string().valid('asc', 'desc').default('desc'),
+  product_id: Joi.number().optional(),
 });
 
 export function validateOrder(data: unknown): JoiValidateResult<Order> {

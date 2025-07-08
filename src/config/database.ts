@@ -1,5 +1,6 @@
 import { MongoClient, Db, MongoClientOptions } from 'mongodb';
 import { log } from '../utils/logger.utils';
+import { EnvUtils } from './env';
 
 class Database {
   private client: MongoClient | null = null;
@@ -8,12 +9,10 @@ class Database {
 
   async connect(): Promise<Db> {
     try {
-      if (this.isConnected && this.db) {
-        return this.db;
-      }
-      const dbUserName = process.env.DB_USER_NAME;
-      const dbPassword = process.env.DB_PASSWORD;
-      const dbName = process.env.DB_NAME;
+      if (this.isConnected && this.db) return this.db;
+
+      const serverConfig = EnvUtils.getServerConfig();
+      const { dbName, dbPassword, dbUserName } = serverConfig;
 
       const requiredVars = [dbUserName, dbPassword, dbName];
 

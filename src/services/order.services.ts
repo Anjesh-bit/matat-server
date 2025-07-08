@@ -5,6 +5,7 @@ import { log } from '../utils/logger.utils';
 import { validateOrder } from '../validations/schema';
 import productServices from './product.services';
 import { Order, OrderQuery } from '../types/order.types';
+import { EnvUtils } from '../config/env';
 
 class OrderService {
   private collection: Collection<Document> | null = null;
@@ -19,8 +20,9 @@ class OrderService {
   public async syncOrders(): Promise<{ synced: number; errors: number }> {
     try {
       await this.initialize();
+      const serverConfig = EnvUtils.getServerConfig();
 
-      const fetchDays = parseInt(process.env.ORDER_FETCH_DAYS || '30', 10);
+      const fetchDays = serverConfig.orderRetentionDays || 30;
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - fetchDays);
 
@@ -188,8 +190,8 @@ class OrderService {
   public async cleanupOldOrders(): Promise<{ deleted: number; productsDeleted: number }> {
     try {
       await this.initialize();
-
-      const retentionDays = parseInt(process.env.ORDER_RETENTION_DAYS || '90', 10);
+      const serverConfig = EnvUtils.getServerConfig();
+      const retentionDays = serverConfig.orderRetentionDays;
       const cutoffDate = new Date();
       cutoffDate.setDate(cutoffDate.getDate() - retentionDays);
 

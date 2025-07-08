@@ -1,18 +1,18 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import routes from './routes/v1';
 import { errorHandler } from './middleware/error-handler.middleware';
 
-import dotenv from 'dotenv';
 import { apiRateLimiter } from './middleware/rate-limit.middleware';
 
 import { whiteListUrls } from './constant/cors.constant';
 import compression from 'compression';
 import helmet from 'helmet';
 import { logger } from './utils/logger.utils';
-
-dotenv.config();
 
 const app = express();
 

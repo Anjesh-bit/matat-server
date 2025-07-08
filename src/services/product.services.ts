@@ -3,28 +3,90 @@ import database from '../config/database';
 import woocommerceAPI from '../config/woocommerce';
 import { log } from '../utils/logger.utils';
 import { validateProduct } from '../validations/schema';
+import pLimit from 'p-limit';
 import { Product, ProductQuery } from '../types/product.types';
 
 class ProductService {
   private collection: Collection<Document> | null = null;
 
   private async initialize(): Promise<void> {
-    if (!this.collection) {
-      const db = await database.connect();
-      this.collection = db.collection('products');
+    try {
+      if (!this.collection) {
+        const db = await database.connect();
+        this.collection = db.collection('products');
+      }
+    } catch (err) {
+      throw err;
     }
   }
 
-  public async syncProductIfNeeded(productId: number): Promise<Document | null> {
+  public async syncAllMissingProducts(): Promise<Document[]> {
     await this.initialize();
+    const db = await database.connect();
+    const ordersCollection = db.collection('orders');
 
-    const existingProduct = await this.collection!.findOne({ id: productId });
-    if (existingProduct) {
-      log('debug', `Product ${productId} already exists, skipping sync`);
-      return existingProduct;
+    const productIdsInOrders = await ordersCollection.distinct('line_items.product_id');
+
+    const existingProductIds = await this.collection!.find({ id: { $in: productIdsInOrders } })
+      .project({ id: 1 })
+      .toArray();
+    const existingIdsSet = new Set(existingProductIds.map((p) => p.id));
+
+    const missingProductIds = productIdsInOrders.filter((id) => !existingIdsSet.has(id));
+
+    const syncedProducts: Document[] = [];
+    const limit = pLimit(5);
+
+    const syncPromises = missingProductIds.map((productId) =>
+      limit(async () => {
+        try {
+          const product = await this.syncProductIfNeeded(productId);
+          if (product) syncedProducts.push(product);
+        } catch (error) {
+          log('error', `Failed to sync product ${productId}:`, error);
+        }
+      })
+    );
+
+    await Promise.all(syncPromises);
+
+    const threeMonthsAgo = new Date();
+    threeMonthsAgo.setMonth(threeMonthsAgo.getMonth() - 3);
+
+    await ordersCollection.deleteMany({ modifiedAt: { $lt: threeMonthsAgo } });
+
+    const remainingProductIds = await ordersCollection.distinct('line_items.product_id');
+
+    const unusedProducts = await this.collection!.find({
+      id: { $nin: remainingProductIds },
+    }).toArray();
+
+    for (const unusedProduct of unusedProducts) {
+      try {
+        await this.deleteProduct(unusedProduct.id);
+        log('info', `Deleted unused product with id ${unusedProduct.id}`);
+      } catch (error) {
+        log('error', `Failed to delete unused product ${unusedProduct.id}:`, error);
+      }
     }
 
-    return await this.syncProduct(productId);
+    return syncedProducts;
+  }
+
+  public async syncProductIfNeeded(productId: number): Promise<Document | null> {
+    try {
+      await this.initialize();
+
+      const existingProduct = await this.collection!.findOne({ id: productId });
+      if (existingProduct) {
+        log('debug', `Product ${productId} already exists, skipping sync`);
+        return existingProduct;
+      }
+      return await this.syncProduct(productId);
+    } catch (error) {
+      log('error', 'syncProductIfNeeded error:', error);
+      throw error;
+    }
   }
 
   public async syncProduct(productId: number): Promise<Document | null> {

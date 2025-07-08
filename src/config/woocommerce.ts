@@ -2,6 +2,7 @@ import axios, { AxiosInstance, AxiosError } from 'axios';
 import { logger } from '../utils/logger.utils';
 import { Order } from '../types/order.types';
 import { Product } from '../types/product.types';
+import { EnvUtils } from './env';
 
 class WooCommerceAPI {
   private baseURL: string;
@@ -10,9 +11,10 @@ class WooCommerceAPI {
   private client: AxiosInstance;
 
   constructor() {
-    this.baseURL = process.env.WOOCOMMERCE_API_BASE_URL || '';
-    this.consumerKey = process.env.WOOCOMMERCE_CONSUMER_KEY || '';
-    this.consumerSecret = process.env.WOOCOMMERCE_CONSUMER_SECRET || '';
+    const wooConfig = EnvUtils.getWooCommerceConfig();
+    this.baseURL = wooConfig.baseUrl;
+    this.consumerKey = wooConfig.consumerKey;
+    this.consumerSecret = wooConfig.consumerSecret;
 
     this.client = axios.create({
       baseURL: `${this.baseURL}/wp-json/wc/v3`,
