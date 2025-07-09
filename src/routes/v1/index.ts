@@ -1,7 +1,7 @@
 import express from 'express';
 import ordersRouter from './order.routes.js';
 import productsRouter from './products.routes.js';
-import syncRouter from './products.routes.js';
+import syncRouter from './sync.routes.js';
 
 const router = express.Router();
 
