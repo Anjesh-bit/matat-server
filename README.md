@@ -284,4 +284,4 @@ The application is ready for deployment on platforms like:
 
 MIT License - see LICENSE file for details.
 
-👉 **Full Project Description:** Check out the [docs/project-description.md](docs/project-description.md) file for detailed information.
+👉 **Full Project Description:** Check out the [docs/overview.md](docs/overview.md) file for detailed information.
