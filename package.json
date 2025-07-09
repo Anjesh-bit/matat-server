@@ -7,7 +7,7 @@
   "scripts": {
     "build": "tsc",
     "start": "cross-env NODE_ENV=production node dist/server.js",
-    "dev": "cross-env NODE_ENV=development nodemon",
+    "dev": "cross-env NODE_ENV=development nodemon --watch src --ext ts --exec tsx src/server.ts",
     "test": "jest --detectOpenHandles",
     "test:watch": "jest --watch --detectOpenHandles",
     "test:coverage": "jest --coverage --detectOpenHandles"
@@ -55,7 +55,7 @@
     "prettier": "^3.6.2",
     "supertest": "^6.3.3",
     "ts-jest": "^29.4.0",
-    "ts-node": "^10.9.2",
+    "tsx": "^4.20.3",
     "typescript": "^5.8.3"
   },
   "jest": {
