@@ -1,8 +1,8 @@
-import OrderService from '../order.services';
-import woocommerceAPI from '../../config/woocommerce';
-import database from '../../config/database';
-import productServices from '../product.services';
-import { validateOrder } from '../../validations/schema';
+import OrderService from '../order.services.js';
+import woocommerceAPI from '../../config/woocommerce.js';
+import database from '../../config/database.js';
+import productServices from '../product.services.js';
+import { validateOrder } from '../../validations/schema.js';
 
 jest.mock('../../config/woocommerce');
 jest.mock('../../config/database');

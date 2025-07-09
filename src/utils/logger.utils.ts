@@ -1,7 +1,7 @@
 import winston from "winston";
 import DailyRotateFile from "winston-daily-rotate-file";
-import { LogLevel } from "../types/logger.types";
-import { levels } from "../constant/logger.constant";
+import { LogLevel } from "../types/logger.types.js";
+import { levels } from "../constant/logger.constant.js";
 
 const isProduction = process.env.NODE_ENV === "production";
 

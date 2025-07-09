@@ -4,8 +4,8 @@ import {
   getOrderByIdHandler,
   getOrdersByProductHandler,
   getOrdersHandler,
-} from '../../controller/order.controller';
-import { validateQuery } from '../../middleware/validate-query.middleware';
+} from '../../controller/order.controller.js';
+import { validateQuery } from '../../middleware/validate-query.middleware.js';
 
 const router = express.Router();
 

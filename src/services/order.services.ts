@@ -1,11 +1,11 @@
-import database from '../config/database';
-import woocommerceAPI from '../config/woocommerce';
+import database from '../config/database.js';
+import woocommerceAPI from '../config/woocommerce.js';
 import { Collection, Document } from 'mongodb';
-import { log } from '../utils/logger.utils';
-import { validateOrder } from '../validations/schema';
-import productServices from './product.services';
-import { Order, OrderQuery } from '../types/order.types';
-import { EnvUtils } from '../config/env';
+import { log } from '../utils/logger.utils.js';
+import { validateOrder } from '../validations/schema.js';
+import productServices from './product.services.js';
+import { Order, OrderQuery } from '../types/order.types.js';
+import { EnvUtils } from '../config/env.js';
 
 class OrderService {
   private collection: Collection<Document> | null = null;

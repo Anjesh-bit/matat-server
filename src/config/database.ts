@@ -1,6 +1,6 @@
 import { MongoClient, Db, MongoClientOptions } from 'mongodb';
-import { log } from '../utils/logger.utils';
-import { EnvUtils } from './env';
+import { log } from '../utils/logger.utils.js';
+import { EnvUtils } from './env.js';
 
 class Database {
   private client: MongoClient | null = null;
