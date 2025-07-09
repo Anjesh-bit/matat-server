@@ -1,10 +1,10 @@
 import express from 'express';
-import { validateQuery } from '../../middleware/validate-query.middleware';
+import { validateQuery } from '../../middleware/validate-query.middleware.js';
 import {
   deleteProductHandler,
   getProductByIdHandler,
   getProductsHandler,
-} from '../../controller/products.controller';
+} from '../../controller/products.controller.js';
 const router = express.Router();
 
 router.get('/', validateQuery, getProductsHandler);

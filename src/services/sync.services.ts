@@ -1,8 +1,8 @@
 import cron from 'node-cron';
-import { SyncResult, SyncStats } from '../types/sync.types';
-import { log } from '../utils/logger.utils';
-import orderServices from './order.services';
-import { EnvUtils } from '../config/env';
+import { SyncResult, SyncStats } from '../types/sync.types.js';
+import { log } from '../utils/logger.utils.js';
+import orderServices from './order.services.js';
+import { EnvUtils } from '../config/env.js';
 
 class SyncService {
   private isRunning: boolean;

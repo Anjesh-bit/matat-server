@@ -1,5 +1,5 @@
-import ProductService from '../product.services';
-import database from '../../config/database';
+import ProductService from '../product.services.js';
+import database from '../../config/database.js';
 
 jest.mock('../../config/database');
 jest.mock('../../config/woocommerce');

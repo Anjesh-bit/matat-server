@@ -1,4 +1,4 @@
-import { syncProductsHandler } from './../../controller/sync.controller';
+import { syncProductsHandler } from '../../controller/sync.controller.js';
 import express from 'express';
 import { getStatusHandler, syncOrdersHandler } from '../../controller/sync.controller.js';
 
