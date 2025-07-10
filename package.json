@@ -2,12 +2,11 @@
   "name": "woocommerce-server",
   "version": "1.0.0",
   "description": "Backend API for WooCommerce sync application",
-  "type": "module",
   "main": "dist/server.js",
   "scripts": {
     "build": "tsc",
     "start": "cross-env NODE_ENV=production node dist/server.js",
-    "dev": "cross-env NODE_ENV=development nodemon --watch src --ext ts --exec tsx src/server.ts",
+    "dev": "cross-env NODE_ENV=development nodemon",
     "test": "jest --detectOpenHandles",
     "test:watch": "jest --watch --detectOpenHandles",
     "test:coverage": "jest --coverage --detectOpenHandles"
@@ -40,7 +39,7 @@
     "@types/cookie-parser": "^1.4.9",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.3",
-    "@types/jest": "^29.5.14",
+    "@types/jest": "^29.5.5",
     "@types/node": "^24.0.10",
     "@types/node-cron": "^3.0.11",
     "@types/supertest": "^6.0.3",
@@ -55,7 +54,7 @@
     "prettier": "^3.6.2",
     "supertest": "^6.3.3",
     "ts-jest": "^29.4.0",
-    "tsx": "^4.20.3",
+    "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   },
   "jest": {

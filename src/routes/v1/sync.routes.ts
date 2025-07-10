@@ -1,6 +1,6 @@
-import { syncProductsHandler } from '../../controller/sync.controller.js';
+import { syncProductsHandler } from '../../controller/sync.controller';
 import express from 'express';
-import { getStatusHandler, syncOrdersHandler } from '../../controller/sync.controller.js';
+import { getStatusHandler, syncOrdersHandler } from '../../controller/sync.controller';
 
 const router = express.Router();
 

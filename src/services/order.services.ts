@@ -1,11 +1,13 @@
-import database from '../config/database.js';
-import woocommerceAPI from '../config/woocommerce.js';
+import database from '../config/database';
+import woocommerceAPI from '../config/woocommerce';
 import { Collection, Document } from 'mongodb';
-import { log } from '../utils/logger.utils.js';
-import { validateOrder } from '../validations/schema.js';
-import productServices from './product.services.js';
-import { Order, OrderQuery } from '../types/order.types.js';
-import { EnvUtils } from '../config/env.js';
+import { log } from '../utils/logger.utils';
+import { validateOrder } from '../validations/schema';
+import productServices from './product.services';
+import { Order, OrderQuery } from '../types/order.types';
+import { EnvUtils } from '../config/env';
+
+import pLimit from 'p-limit';
 
 class OrderService {
   private collection: Collection<Document> | null = null;
@@ -18,66 +20,71 @@ class OrderService {
   }
 
   public async syncOrders(): Promise<{ synced: number; errors: number }> {
-    try {
-      await this.initialize();
-      const serverConfig = EnvUtils.getServerConfig();
+    await this.initialize();
 
-      const fetchDays = serverConfig.orderRetentionDays || 30;
-      const thirtyDaysAgo = new Date();
-      thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - fetchDays);
+    const serverConfig = EnvUtils.getServerConfig();
+    const fetchDays = serverConfig.orderRetentionDays || 30;
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - fetchDays);
 
-      let page = 1;
-      let hasMore = true;
-      let totalSynced = 0;
-      let totalErrors = 0;
+    const orderConcurrencyLimit = 5;
+    const productConcurrencyLimit = 5;
+    const limitOrders = pLimit(orderConcurrencyLimit);
+    const limitProducts = pLimit(productConcurrencyLimit);
 
-      while (hasMore) {
-        try {
-          const orders = await woocommerceAPI.fetchOrders({
-            page,
-            per_page: 100,
-            after: thirtyDaysAgo.toISOString(),
-            orderby: 'date',
-            order: 'desc',
-          });
+    let page = 1;
+    let hasMore = true;
+    let totalSynced = 0;
+    let totalErrors = 0;
 
-          if (!orders || orders.length === 0) {
-            hasMore = false;
-            break;
-          }
+    while (hasMore) {
+      try {
+        const orders: Order[] = await woocommerceAPI.fetchOrders({
+          page,
+          per_page: 100,
+          after: thirtyDaysAgo.toISOString(),
+          orderby: 'date',
+          order: 'desc',
+        });
 
-          for (const order of orders) {
-            try {
-              await this.processOrder(order);
-              totalSynced++;
-            } catch (error) {
-              log('error', `Error processing order ${order.id}:`, error);
-              totalErrors++;
-            }
-          }
-
-          page++;
-          hasMore = orders.length === 100;
-
-          // Delay to avoid rate limiting
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-        } catch (error) {
-          log('error', `Error fetching orders page ${page}:`, error);
-          totalErrors++;
+        if (!orders || orders.length === 0) {
+          hasMore = false;
           break;
         }
-      }
 
-      log('info', `Order sync completed. Synced: ${totalSynced}, Errors: ${totalErrors}`);
-      return { synced: totalSynced, errors: totalErrors };
-    } catch (error) {
-      log('error', 'Error in order sync:', error);
-      throw error;
+        // Process orders concurrently with limit
+        const results = await Promise.all(
+          orders.map((order) =>
+            limitOrders(async () => {
+              try {
+                await this.processOrder(order, limitProducts);
+                return { success: true };
+              } catch (error) {
+                log('error', `Error processing order ${order.id}:`, error);
+                return { success: false };
+              }
+            })
+          )
+        );
+
+        totalSynced += results.filter((r) => r.success).length;
+        totalErrors += results.filter((r) => !r.success).length;
+
+        page++;
+        hasMore = orders.length === 100;
+      } catch (error) {
+        log('error', `Error fetching orders page ${page}:`, error);
+        totalErrors++;
+        break;
+      }
     }
+
+    log('info', `Order sync completed. Synced: ${totalSynced}, Errors: ${totalErrors}`);
+    return { synced: totalSynced, errors: totalErrors };
   }
 
-  private async processOrder(orders: Order): Promise<void> {
-    const { error, value } = validateOrder(orders);
+  private async processOrder(orderData: Order, limitProducts: pLimit.Limit): Promise<void> {
+    const { error, value } = validateOrder(orderData);
     if (error) {
       log('error', 'Order validation failed:', error);
       throw new Error(`Order validation failed: ${error.message}`);
@@ -99,15 +106,17 @@ class OrderService {
       syncedAt: new Date(),
     };
 
-    for (const item of order.line_items) {
-      if (item.product_id) {
-        try {
-          await productServices.syncProductIfNeeded(Number(item.product_id));
-        } catch (error) {
-          log('error', `Error syncing product ${item.product_id}:`, error);
-        }
-      }
-    }
+    await Promise.all(
+      order.line_items
+        .filter((item) => item.product_id)
+        .map((item) =>
+          limitProducts(() =>
+            productServices.syncProductIfNeeded(Number(item.product_id)).catch((error) => {
+              log('error', `Error syncing product ${item.product_id}:`, error);
+            })
+          )
+        )
+    );
 
     await this.collection!.replaceOne({ id: order.id }, order, { upsert: true });
 
@@ -199,9 +208,7 @@ class OrderService {
         date_created: { $lt: cutoffDate },
       }).toArray();
 
-      const isEmptyOrdersToDelete = ordersToDelete.length === 0;
-
-      if (isEmptyOrdersToDelete) {
+      if (ordersToDelete.length === 0) {
         log('info', 'No old orders to cleanup');
         return { deleted: 0, productsDeleted: 0 };
       }

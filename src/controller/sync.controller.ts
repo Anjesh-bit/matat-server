@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
-import syncServices from '../services/sync.services.js';
-import productServices from '../services/product.services.js';
+import syncServices from '../services/sync.services';
+import productServices from '../services/product.services';
 
 export const syncOrdersHandler = async (
   _: Request,

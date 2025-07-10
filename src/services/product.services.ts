@@ -1,10 +1,10 @@
 import { Collection, Document } from 'mongodb';
-import database from '../config/database.js';
-import woocommerceAPI from '../config/woocommerce.js';
-import { log } from '../utils/logger.utils.js';
-import { validateProduct } from '../validations/schema.js';
+import database from '../config/database';
+import woocommerceAPI from '../config/woocommerce';
+import { log } from '../utils/logger.utils';
+import { validateProduct } from '../validations/schema';
 import pLimit from 'p-limit';
-import { Product, ProductQuery } from '../types/product.types.js';
+import { Product, ProductQuery } from '../types/product.types';
 
 class ProductService {
   private collection: Collection<Document> | null = null;

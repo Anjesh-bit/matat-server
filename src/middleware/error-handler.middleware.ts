@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { log } from '../utils/logger.utils.js';
+import { log } from '../utils/logger.utils';
 
 interface CustomError extends Error {
   statusCode?: number;
