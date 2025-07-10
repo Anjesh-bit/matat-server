@@ -1,15 +1,15 @@
-import winston from "winston";
-import DailyRotateFile from "winston-daily-rotate-file";
-import { LogLevel } from "../types/logger.types.js";
-import { levels } from "../constant/logger.constant.js";
+import winston from 'winston';
+import DailyRotateFile from 'winston-daily-rotate-file';
+import { LogLevel } from '../types/logger.types';
+import { levels } from '../constant/logger.constant';
 
-const isProduction = process.env.NODE_ENV === "production";
+const isProduction = process.env.NODE_ENV === 'production';
 
 const consoleFormat = winston.format.combine(
   winston.format.colorize(),
-  winston.format.timestamp({ format: "YYYY-MM-DD HH:mm:ss" }),
+  winston.format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
   winston.format.printf(({ timestamp, level, message, ...meta }) => {
-    const metaString = Object.keys(meta).length ? JSON.stringify(meta) : "";
+    const metaString = Object.keys(meta).length ? JSON.stringify(meta) : '';
     return `[${timestamp}] ${level}: ${message} ${metaString}`;
   })
 );
@@ -21,48 +21,45 @@ const jsonFormat = winston.format.combine(
 );
 
 export const logger = winston.createLogger({
-  level: process.env.LOG_LEVEL || (isProduction ? "info" : "debug"),
+  level: process.env.LOG_LEVEL || (isProduction ? 'info' : 'debug'),
   levels: winston.config.npm.levels,
   format: isProduction ? jsonFormat : consoleFormat,
   transports: [
     new winston.transports.Console({
       format: isProduction
-        ? winston.format.combine(
-            winston.format.timestamp(),
-            winston.format.json()
-          )
+        ? winston.format.combine(winston.format.timestamp(), winston.format.json())
         : consoleFormat,
     }),
 
     new DailyRotateFile({
-      filename: "logs/error-%DATE%.log",
-      datePattern: "YYYY-MM-DD",
-      level: "error",
-      maxFiles: "14d",
+      filename: 'logs/error-%DATE%.log',
+      datePattern: 'YYYY-MM-DD',
+      level: 'error',
+      maxFiles: '14d',
       zippedArchive: true,
     }),
 
     new DailyRotateFile({
-      filename: "logs/combined-%DATE%.log",
-      datePattern: "YYYY-MM-DD",
-      maxFiles: "14d",
+      filename: 'logs/combined-%DATE%.log',
+      datePattern: 'YYYY-MM-DD',
+      maxFiles: '14d',
       zippedArchive: true,
     }),
   ],
   exceptionHandlers: [
     new DailyRotateFile({
-      filename: "logs/exceptions-%DATE%.log",
-      datePattern: "YYYY-MM-DD",
-      maxFiles: "14d",
+      filename: 'logs/exceptions-%DATE%.log',
+      datePattern: 'YYYY-MM-DD',
+      maxFiles: '14d',
       zippedArchive: true,
     }),
     new winston.transports.Console(),
   ],
   rejectionHandlers: [
     new DailyRotateFile({
-      filename: "logs/rejections-%DATE%.log",
-      datePattern: "YYYY-MM-DD",
-      maxFiles: "14d",
+      filename: 'logs/rejections-%DATE%.log',
+      datePattern: 'YYYY-MM-DD',
+      maxFiles: '14d',
       zippedArchive: true,
     }),
     new winston.transports.Console(),

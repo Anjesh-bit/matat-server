@@ -4,10 +4,10 @@ dotenv.config();
 import { pathToFileURL } from 'url';
 import path from 'path';
 
-import app from './app.js';
-import database from './config/database.js';
-import syncServices from './services/sync.services.js';
-import { logger } from './utils/logger.utils.js';
+import app from './app';
+import database from './config/database';
+import syncServices from './services/sync.services';
+import { logger } from './utils/logger.utils';
 
 const PORT = process.env.PORT || 5000;
 
@@ -37,7 +37,7 @@ const startServer = async () => {
   }
 };
 
-const currentFileUrl = import.meta.url;
+const currentFileUrl = pathToFileURL(__filename).href;
 const entryFilePath = process.argv[1];
 const entryFileUrl = pathToFileURL(path.resolve(entryFilePath)).href;
 

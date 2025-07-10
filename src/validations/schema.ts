@@ -1,7 +1,7 @@
 import Joi, { ValidationResult } from 'joi';
-import { Order } from '../types/order.types.js';
-import { Product } from '../types/product.types.js';
-import { QueryParams } from '../types/query-params.types.js';
+import { Order } from '../types/order.types';
+import { Product } from '../types/product.types';
+import { QueryParams } from '../types/query-params.types';
 
 type JoiValidateResult<T> = ValidationResult<T>;
 

@@ -4,15 +4,15 @@ dotenv.config();
 import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
-import routes from './routes/v1/index.js';
-import { errorHandler } from './middleware/error-handler.middleware.js';
+import routes from './routes/v1/index';
+import { errorHandler } from './middleware/error-handler.middleware';
 
-import { apiRateLimiter } from './middleware/rate-limit.middleware.js';
+import { apiRateLimiter } from './middleware/rate-limit.middleware';
 
-import { whiteListUrls } from './constant/cors.constant.js';
+import { whiteListUrls } from './constant/cors.constant';
 import compression from 'compression';
 import helmet from 'helmet';
-import { logger } from './utils/logger.utils.js';
+import { logger } from './utils/logger.utils';
 
 const app = express();
 

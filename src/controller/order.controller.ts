@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import orderServices from '../services/order.services.js';
+import orderServices from '../services/order.services';
 
 export const getOrdersHandler = async (
   req: Request,

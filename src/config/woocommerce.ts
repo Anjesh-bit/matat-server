@@ -1,8 +1,8 @@
 import axios, { AxiosInstance, AxiosError } from 'axios';
-import { logger } from '../utils/logger.utils.js';
-import { Order } from '../types/order.types.js';
-import { Product } from '../types/product.types.js';
-import { EnvUtils } from './env.js';
+import { logger } from '../utils/logger.utils';
+import { Order } from '../types/order.types';
+import { Product } from '../types/product.types';
+import { EnvUtils } from './env';
 
 class WooCommerceAPI {
   private baseURL: string;
