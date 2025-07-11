@@ -149,10 +149,17 @@ src/
 
 - `GET /api/v1/sync/status` - Get sync status
 - `POST /api/v1/sync/trigger` - Trigger manual sync
+- 
+### 🩺 Health Check
 
-### Health Check
+Before proceeding, make sure the API is running — since Render uses a free tier, the backend may go to sleep or be temporarily unavailable.
 
-- `GET /api/v1/health` - Health check endpoint
+- 🌐 **Live Health Check URL:**  
+  [https://woocommerce-sync-backend.onrender.com/health](https://woocommerce-sync-backend.onrender.com/health)
+
+- 📥 **Health Check Endpoint:**  
+  `GET /api/v1/health` — Returns a status response to confirm the WooCommerce Sync API is live.
+
 
 ## Testing
 
